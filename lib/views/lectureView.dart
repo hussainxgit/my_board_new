@@ -39,6 +39,8 @@ class _LectureViewState extends State<LectureView> {
           future: _services.getTodayLecture(),
           builder: (context, AsyncSnapshot<Lecture> snapshot) {
             List<Widget> children;
+            this.lecture = snapshot.data;
+
             if (snapshot.hasData) {
               return ListView(
                 children: [
