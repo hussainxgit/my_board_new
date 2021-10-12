@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:my_board_new/models/Lecture.dart';
 import 'package:my_board_new/models/Resident.dart';
 
@@ -52,12 +53,13 @@ class Services {
   }
 
   Future<bool> attendResident(Lecture lecture, Resident resident) async {
-    List<String> lectureAttendees =
+    List<Map<String, dynamic>> lectureAttendees =
         await getLecture(lecture.id).then((value) => value.residents);
     if (lectureAttendees.contains(resident.id)) {
       return false;
     } else {
-      lectureAttendees.add(resident.name);
+      String _now = DateFormat('hh:mm a').format(DateTime.now());
+      lectureAttendees.add({'name': resident.name, 'time': '$_now'});
       return await _lecturesCollection
           .doc(lecture.id)
           .update({'residents': lectureAttendees}).then((value) => true);
@@ -65,16 +67,14 @@ class Services {
   }
 
   Future<bool> absentResident(Lecture lecture, Resident resident) async {
-    List<String> lectureAttendees =
+    List<Map<String, dynamic>> lectureAttendees =
         await getLecture(lecture.id).then((value) => value.residents);
-    if (lectureAttendees.contains(resident.name)) {
-      lectureAttendees.remove(resident.name);
-      return await _lecturesCollection
-          .doc(lecture.id)
-          .update({'residents': lectureAttendees}).then((value) => true);
-    } else {
-      return false;
-    }
+
+    lectureAttendees.removeWhere((item) => item['name'] == resident.name);
+
+    return await _lecturesCollection
+        .doc(lecture.id)
+        .update({'residents': lectureAttendees}).then((value) => true);
   }
 
   Future<bool> excusedAbsenceResident(

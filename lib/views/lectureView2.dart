@@ -10,14 +10,18 @@ import 'package:my_board_new/services/utilities.dart';
 
 class LectureView2 extends StatefulWidget {
   final Lecture lecture;
+
   @override
   _LectureView2State createState() => _LectureView2State(lecture: this.lecture);
+
   LectureView2({@required this.lecture});
 }
 
 class _LectureView2State extends State<LectureView2> {
   Lecture lecture;
+
   _LectureView2State({@required this.lecture});
+
   Services _services = Services();
   Utilities _utilities = Utilities();
   List<Resident> residents = [];
@@ -33,13 +37,10 @@ class _LectureView2State extends State<LectureView2> {
   List<String> selectedResidentListIcon = [];
   List<String> excusedAbsenceResidentListIcon = [];
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(
-        '${lecture.date.year.toString()}/${lecture.date.month.toString()}/${lecture.date.day.toString()}')),
+      appBar: AppBar(title: Text(lecture.lecturer)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
@@ -105,7 +106,7 @@ class _LectureView2State extends State<LectureView2> {
                     ),
                     Text(
                       (lecture.residents.length == null ||
-                          lecture.residents.isEmpty
+                              lecture.residents.isEmpty
                           ? '0'
                           : lecture.residents.length.toString()),
                     ),
@@ -137,21 +138,19 @@ class _LectureView2State extends State<LectureView2> {
             ),
             FutureBuilder<List<Resident>>(
                 future: _services.getAllResidents(),
-                builder: (context,
-                    AsyncSnapshot<List<Resident>> residentsList) {
+                builder:
+                    (context, AsyncSnapshot<List<Resident>> residentsList) {
                   List<Widget> children;
                   List<bool> selectedResidentList = [];
                   residents.clear();
                   if (residentsList.hasData) {
-                    // for residents list ui
-                    selectedResidentList = residentsList.data.map((e) {
-                      if (lecture.residents.contains(e.name)) {
-                        residents.add(e);
-                        return true;
+                    residentsList.data.forEach((element) {
+                      if (lecture.getAttendedByName(element.name) != null) {
+                        selectedResidentList.add(true);
                       } else {
-                        return false;
+                        selectedResidentList.add(false);
                       }
-                    }).toList();
+                    });
                     return ListView.builder(
                       physics: ScrollPhysics(),
                       shrinkWrap: true,
@@ -161,51 +160,71 @@ class _LectureView2State extends State<LectureView2> {
                             .add((iconShuffle..shuffle()).first);
                         return ListTile(
                           selected: selectedResidentList[index],
-                          title: Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                  child: Text(
-                                      residentsList.data[index].name)),
-                              selectedResidentList[index] == false
-                                  ? IconButton(
-                                  icon: lecture.getExcusedAbsenceByName(residentsList.data[index].name) != null ? Icon(Icons.sd_card_alert_outlined) : Icon(Icons.done),
-                                  onPressed: () {
-                                    _services
-                                        .attendResident(lecture,
-                                        residentsList.data[index])
-                                        .then((value) {
-                                      if (value == true) {
-                                        setState(() {
-                                          selectedResidentList[
-                                          index] = true;
-                                        });
-                                      }
-                                    });
-                                  })
-                                  : SizedBox(),
-                              selectedResidentList[index] == true
-                                  ? InkWell(
-                                onTap: () {
-                                  _services
-                                      .absentResident(lecture,
-                                      residentsList.data[index])
-                                      .then((value) {
-                                    if (value == true) {
-                                      setState(() {
-                                        selectedResidentList[
-                                        index] = false;
-                                      });
-                                    }
-                                  });
-                                },
-                                child: Image.asset(
-                                    selectedResidentListIcon[
-                                    index],
-                                    width: 50),
-                              )
-                                  : SizedBox(),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                      child:
+                                          Text(residentsList.data[index].name)),
+                                  selectedResidentList[index] == false
+                                      ? IconButton(
+                                          icon: lecture.getExcusedAbsenceByName(
+                                                      residentsList
+                                                          .data[index].name) !=
+                                                  null
+                                              ? Icon(
+                                                  Icons.sd_card_alert_outlined)
+                                              : Icon(Icons.done),
+                                          onPressed: () {
+                                            _services
+                                                .attendResident(lecture,
+                                                    residentsList.data[index])
+                                                .then((value) {
+                                              if (value == true) {
+                                                setState(() {
+                                                  selectedResidentList[index] =
+                                                      true;
+                                                });
+                                              }
+                                            });
+                                          })
+                                      : SizedBox(),
+                                  selectedResidentList[index] == true
+                                      ? InkWell(
+                                          onTap: () {
+                                            _services
+                                                .absentResident(lecture,
+                                                    residentsList.data[index])
+                                                .then((value) {
+                                              if (value == true) {
+                                                setState(() {
+                                                  selectedResidentList[index] =
+                                                      false;
+                                                });
+                                              }
+                                            });
+                                          },
+                                          child: Image.asset(
+                                              selectedResidentListIcon[index],
+                                              width: 50),
+                                        )
+                                      : SizedBox(),
+                                ],
+                              ),
+                              Text(lecture.getAttendedByName(
+                                          residentsList.data[index].name) !=
+                                      null
+                                  ? lecture.getAttendedByName(residentsList
+                                              .data[index].name)['time'] !=
+                                          null
+                                      ? lecture.getAttendedByName(residentsList
+                                          .data[index].name)['time']
+                                      : ''
+                                  : '')
                             ],
                           ),
                           onLongPress: () {
@@ -216,8 +235,7 @@ class _LectureView2State extends State<LectureView2> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
                                       Padding(
-                                        padding:
-                                        const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(8.0),
                                         child: Container(
                                             decoration: BoxDecoration(
                                                 color: Colors.grey,
@@ -225,10 +243,8 @@ class _LectureView2State extends State<LectureView2> {
                                                   color: Colors.grey,
                                                   width: 5,
                                                 ),
-                                                borderRadius:
-                                                BorderRadius.all(
-                                                    Radius.circular(
-                                                        20))),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(20))),
                                             height: 5,
                                             width: 50),
                                       ),
@@ -236,24 +252,19 @@ class _LectureView2State extends State<LectureView2> {
                                         height: 30,
                                       ),
                                       ListTile(
-                                          title: Text(residentsList
-                                              .data[index].name)),
+                                          title: Text(
+                                              residentsList.data[index].name)),
                                       Divider(),
                                       ListTile(
-                                        title:
-                                        new Text('Excused absence'),
+                                        title: new Text('Excused absence'),
                                         onTap: () {
                                           showExcuseAbsenceFormDialog(
                                               context,
-                                              lecture
-                                                  .getExcusedAbsenceByName(
+                                              lecture.getExcusedAbsenceByName(
                                                   residentsList
-                                                      .data[index]
-                                                      .name),
+                                                      .data[index].name),
                                               lecture,
                                               residentsList.data[index]);
-
-                                          List<Map<String, dynamic>> excusedAbsence = lecture.excusedAbsence;
                                         },
                                       ),
                                       SizedBox(

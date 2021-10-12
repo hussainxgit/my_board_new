@@ -42,13 +42,13 @@ class _AllLecturesViewState extends State<AllLecturesView> {
                       itemCount: snapshot.data.length,
                       itemBuilder: (context, index) {
                         return ListTile(
-                          onTap: (){
+                          onTap: () {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (_) => LectureView2(
-                                      lecture: snapshot.data[index],
-                                    )));
+                                          lecture: snapshot.data[index],
+                                        )));
                           },
                           onLongPress: () {
                             showModalBottomSheet(
@@ -75,21 +75,22 @@ class _AllLecturesViewState extends State<AllLecturesView> {
                                         height: 30,
                                       ),
                                       ListTile(
-                                        title:
-                                        new Text('${snapshot.data[index].date.year.toString()}/${snapshot.data[index].date.month.toString()}/${snapshot.data[index].date.day.toString()} - ${snapshot.data[index].lecturer}'),
+                                        title: new Text(
+                                            '${snapshot.data[index].date.year.toString()}/${snapshot.data[index].date.month.toString()}/${snapshot.data[index].date.day.toString()} - ${snapshot.data[index].lecturer}'),
                                       ),
                                       Divider(),
                                       ListTile(
                                         title: new Text('Edit'),
-                                        onTap: (){
+                                        onTap: () {
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (_) => EditLecture(
-                                                    lecture: snapshot.data[index],
-                                                    triggerUpdateLecturesFunc:
-                                                    updateLecturesList,
-                                                  )));
+                                                        lecture: snapshot
+                                                            .data[index],
+                                                        triggerUpdateLecturesFunc:
+                                                            updateLecturesList,
+                                                      )));
                                         },
                                       ),
                                       SizedBox(
@@ -98,11 +99,13 @@ class _AllLecturesViewState extends State<AllLecturesView> {
                                       ListTile(
                                         title: new Text('Delete'),
                                         onTap: () {
-                                          _services.deleteLecture(snapshot.data[index]).then((value) {
+                                          _services
+                                              .deleteLecture(
+                                                  snapshot.data[index])
+                                              .then((value) {
                                             updateLecturesList();
                                             Navigator.pop(context);
                                           });
-
                                         },
                                       ),
                                       SizedBox(

@@ -1,13 +1,11 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_board_new/models/Resident.dart';
 
 class Lecture {
   String id, location, lecturer, subject;
   DateTime date;
-  List<String> residents = [];
-  List<Resident> residents2 = [];
+  List<Map<String, dynamic>> residents = [];
+  List<Resident> getAttendedR = [];
   List<Map<String, dynamic>> excusedAbsence = [];
 
   Lecture({
@@ -31,7 +29,7 @@ class Lecture {
     };
     if (this.residents != null || this.residents.isNotEmpty) {
       data.addAll({
-        'residents': this.residents.map<String>((e) => e).toList(),
+        'residents': this.residents.map<Map<String, dynamic>>((e) => e).toList(),
       });
     } else {
       data.addAll({'residents': []});
@@ -59,7 +57,7 @@ class Lecture {
       lecturer: map['lecturer'] as String,
       date: DateTime.fromMillisecondsSinceEpoch(timestampDate.seconds * 1000),
       subject: map['subject'] as String,
-      residents: map['residents'].cast<String>(),
+      residents: map['residents'] != null ? (map['residents'] as List<dynamic>).map<Map<String, dynamic>>((item) => item).toList() : [],
       excusedAbsence: map['excusedAbsence'] != null ? (map['excusedAbsence'] as List<dynamic>).map<Map<String, dynamic>>((item) => item).toList() : [],
     );
   }
@@ -73,7 +71,7 @@ class Lecture {
     };
     if (this.residents != null) {
       data.addAll({
-        'residents': this.residents.map<String>((e) => e).toList(),
+        'residents': this.residents.map<Map<String, dynamic>>((e) => e).toList(),
       });
     } else {
       data.addAll({'residents': []});
@@ -90,17 +88,22 @@ class Lecture {
   }
 
   List<Resident> getAttendedResidents(List<Resident> givenResident) {
-    residents2.clear();
+    getAttendedR.clear();
     givenResident.forEach((resident) {
       if (residents.contains(resident.name)) {
-        residents2.add(resident);
+        getAttendedR.add(resident);
       }
     });
-    return residents2;
+    return getAttendedR;
   }
 
   Map<String, dynamic> getExcusedAbsenceByName(String name){
     return excusedAbsence.firstWhere((o) => o['name'] == name , orElse: () => null);
+
+  }
+
+  Map<String, dynamic> getAttendedByName(String name){
+    return residents.firstWhere((o) => o['name'] == name , orElse: () => null);
 
   }
 

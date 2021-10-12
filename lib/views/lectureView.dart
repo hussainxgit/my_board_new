@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:my_board_new/customWidgets/CustomAlertDialogs.dart';
 import 'package:my_board_new/customWidgets/CustomMessages.dart';
@@ -18,6 +16,7 @@ class _LectureViewState extends State<LectureView> {
   Utilities _utilities = Utilities();
   Lecture lecture;
   List<Resident> residents = [];
+
   List<String> iconShuffle = [
     'graphics/emoji_gif_100px/emoji_28.gif',
     'graphics/emoji_gif_100px/emoji_25.gif',
@@ -143,15 +142,14 @@ class _LectureViewState extends State<LectureView> {
                         List<bool> selectedResidentList = [];
                         residents.clear();
                         if (residentsList.hasData) {
-                          // for residents list ui
-                          selectedResidentList = residentsList.data.map((e) {
-                            if (snapshot.data.residents.contains(e.name)) {
-                              residents.add(e);
-                              return true;
+                          residentsList.data.forEach((element) {
+                            if (snapshot.data.getAttendedByName(element.name) !=
+                                null) {
+                              selectedResidentList.add(true);
                             } else {
-                              return false;
+                              selectedResidentList.add(false);
                             }
-                          }).toList();
+                          });
                           return ListView.builder(
                             physics: ScrollPhysics(),
                             shrinkWrap: true,
@@ -161,51 +159,81 @@ class _LectureViewState extends State<LectureView> {
                                   .add((iconShuffle..shuffle()).first);
                               return ListTile(
                                 selected: selectedResidentList[index],
-                                title: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Expanded(
-                                        child: Text(
-                                            residentsList.data[index].name)),
-                                    selectedResidentList[index] == false
-                                        ? IconButton(
-                                            icon: snapshot.data.getExcusedAbsenceByName(residentsList.data[index].name) != null ? Icon(Icons.sd_card_alert_outlined) : Icon(Icons.done),
-                                            onPressed: () {
-                                              _services
-                                                  .attendResident(snapshot.data,
-                                                      residentsList.data[index])
-                                                  .then((value) {
-                                                if (value == true) {
-                                                  setState(() {
-                                                    selectedResidentList[
-                                                        index] = true;
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                            child: Text(residentsList
+                                                .data[index].name)),
+                                        selectedResidentList[index] == false
+                                            ? IconButton(
+                                                icon: snapshot.data
+                                                            .getExcusedAbsenceByName(
+                                                                residentsList
+                                                                    .data[index]
+                                                                    .name) !=
+                                                        null
+                                                    ? Icon(Icons
+                                                        .sd_card_alert_outlined)
+                                                    : Icon(Icons.done),
+                                                onPressed: () {
+                                                  _services
+                                                      .attendResident(
+                                                          snapshot.data,
+                                                          residentsList
+                                                              .data[index])
+                                                      .then((value) {
+                                                    if (value == true) {
+                                                      setState(() {
+                                                        selectedResidentList[
+                                                            index] = true;
+                                                      });
+                                                    }
                                                   });
-                                                }
-                                              });
-                                            })
-                                        : SizedBox(),
-                                    selectedResidentList[index] == true
-                                        ? InkWell(
-                                            onTap: () {
-                                              _services
-                                                  .absentResident(snapshot.data,
-                                                      residentsList.data[index])
-                                                  .then((value) {
-                                                if (value == true) {
-                                                  setState(() {
-                                                    selectedResidentList[
-                                                        index] = false;
+                                                })
+                                            : SizedBox(),
+                                        selectedResidentList[index] == true
+                                            ? InkWell(
+                                                onTap: () {
+                                                  _services
+                                                      .absentResident(
+                                                          snapshot.data,
+                                                          residentsList
+                                                              .data[index])
+                                                      .then((value) {
+                                                    if (value == true) {
+                                                      setState(() {
+                                                        selectedResidentList[
+                                                            index] = false;
+                                                      });
+                                                    }
                                                   });
-                                                }
-                                              });
-                                            },
-                                            child: Image.asset(
-                                                selectedResidentListIcon[
-                                                index],
-                                                width: 50),
-                                          )
-                                        : SizedBox(),
+                                                },
+                                                child: Image.asset(
+                                                    selectedResidentListIcon[
+                                                        index],
+                                                    width: 50),
+                                              )
+                                            : SizedBox(),
+                                      ],
+                                    ),
+                                    Text(snapshot.data.getAttendedByName(
+                                                residentsList
+                                                    .data[index].name) !=
+                                            null
+                                        ? snapshot.data.getAttendedByName(
+                                                    residentsList.data[index]
+                                                        .name)['time'] !=
+                                                null
+                                            ? snapshot.data.getAttendedByName(
+                                                residentsList
+                                                    .data[index].name)['time']
+                                            : ''
+                                        : '')
                                   ],
                                 ),
                                 onLongPress: () {
