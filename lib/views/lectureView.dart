@@ -13,7 +13,7 @@ class LectureView extends StatefulWidget {
 
 class _LectureViewState extends State<LectureView> {
   Services _services = Services();
-  Utilities _utilities = Utilities();
+  // Utilities _utilities = Utilities();
   Lecture lecture;
   List<Resident> residents = [];
 
@@ -374,26 +374,26 @@ class _LectureViewState extends State<LectureView> {
           },
         ),
       ),
-      floatingActionButton: ElevatedButton.icon(
-          icon: Icon(Icons.download),
-          onPressed: () async {
-            if (this.lecture != null) {
-              if (this.residents.isNotEmpty) {
-                _utilities.setExcelLectureAttendees(
-                    this.lecture, this.residents);
-                showCustomSnackBar(
-                    context, 'Excel file created in downloads directory');
-              } else {
-                _utilities.setExcelLectureAttendees(
-                    this.lecture, this.residents);
-                showCustomSnackBar(context,
-                    'Excel file created in downloads directory, with 0 attendees');
-              }
-            } else {
-              showCustomSnackBar(context, 'Error, No lecture found today');
-            }
-          },
-          label: Text('Download as Excel')),
+      // floatingActionButton: ElevatedButton.icon(
+      //     icon: Icon(Icons.download),
+      //     onPressed: () async {
+      //       if (this.lecture != null) {
+      //         if (this.residents.isNotEmpty) {
+      //           _utilities.setExcelLectureAttendees(
+      //               this.lecture, this.residents);
+      //           showCustomSnackBar(
+      //               context, 'Excel file created in downloads directory');
+      //         } else {
+      //           _utilities.setExcelLectureAttendees(
+      //               this.lecture, this.residents);
+      //           showCustomSnackBar(context,
+      //               'Excel file created in downloads directory, with 0 attendees');
+      //         }
+      //       } else {
+      //         showCustomSnackBar(context, 'Error, No lecture found today');
+      //       }
+      //     },
+      //     label: Text('Download as Excel')),
     );
   }
 }

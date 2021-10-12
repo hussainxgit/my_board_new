@@ -10,7 +10,6 @@ import 'package:my_board_new/services/utilities.dart';
 
 class LectureView2 extends StatefulWidget {
   final Lecture lecture;
-
   @override
   _LectureView2State createState() => _LectureView2State(lecture: this.lecture);
 
@@ -19,11 +18,12 @@ class LectureView2 extends StatefulWidget {
 
 class _LectureView2State extends State<LectureView2> {
   Lecture lecture;
+  List<bool> selectedResidentList = [];
 
   _LectureView2State({@required this.lecture});
 
   Services _services = Services();
-  Utilities _utilities = Utilities();
+  // Utilities _utilities = Utilities();
   List<Resident> residents = [];
   List<String> iconShuffle = [
     'graphics/emoji_gif_100px/emoji_28.gif',
@@ -141,7 +141,6 @@ class _LectureView2State extends State<LectureView2> {
                 builder:
                     (context, AsyncSnapshot<List<Resident>> residentsList) {
                   List<Widget> children;
-                  List<bool> selectedResidentList = [];
                   residents.clear();
                   if (residentsList.hasData) {
                     residentsList.data.forEach((element) {
@@ -316,26 +315,26 @@ class _LectureView2State extends State<LectureView2> {
           ],
         ),
       ),
-      floatingActionButton: ElevatedButton.icon(
-          icon: Icon(Icons.download),
-          onPressed: () async {
-            if (this.lecture != null) {
-              if (this.residents.isNotEmpty) {
-                _utilities.setExcelLectureAttendees(
-                    this.lecture, this.residents);
-                showCustomSnackBar(
-                    context, 'Excel file created in downloads directory');
-              } else {
-                _utilities.setExcelLectureAttendees(
-                    this.lecture, this.residents);
-                showCustomSnackBar(context,
-                    'Excel file created in downloads directory, with 0 attendees');
-              }
-            } else {
-              showCustomSnackBar(context, 'Error, No lecture found today');
-            }
-          },
-          label: Text('Download as Excel')),
+      // floatingActionButton: ElevatedButton.icon(
+      //     icon: Icon(Icons.download),
+      //     onPressed: () async {
+      //       if (this.lecture != null) {
+      //         if (this.residents.isNotEmpty) {
+      //           _utilities.setExcelLectureAttendees(
+      //               this.lecture, this.residents);
+      //           showCustomSnackBar(
+      //               context, 'Excel file created in downloads directory');
+      //         } else {
+      //           _utilities.setExcelLectureAttendees(
+      //               this.lecture, this.residents);
+      //           showCustomSnackBar(context,
+      //               'Excel file created in downloads directory, with 0 attendees');
+      //         }
+      //       } else {
+      //         showCustomSnackBar(context, 'Error, No lecture found today');
+      //       }
+      //     },
+      //     label: Text('Download as Excel')),
     );
   }
 }
